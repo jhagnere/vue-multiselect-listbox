@@ -1,5 +1,6 @@
 const path = require('path');
 const { VueLoaderPlugin } = require('vue-loader');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
@@ -20,10 +21,11 @@ module.exports = {
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.js', '.vue'],
+    extensions: ['.ts', '.tsx', '.js', '.vue'],
     alias: {
-      components: path.resolve(__dirname, 'src/components/'),
-      utils: path.resolve(__dirname, 'src/utils/'),
+      '@': path.resolve(__dirname, '../src/'),
+      components: path.resolve(__dirname, '../src/components/'),
+      utils: path.resolve(__dirname, '../src/utils/'),
     },
   },
   module: {
@@ -31,6 +33,11 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
+      },
+      {
+        test: /\.ts$/,
+        loader: 'ts-loader',
+        options: { appendTsSuffixTo: [/\.vue$/], transpileOnly: true },
       },
       {
         test: /\.js$/,
@@ -44,7 +51,7 @@ module.exports = {
       },
       {
         test: /\.s?css$/,
-        loader: [
+        use: [
           extractOrInjectStyles,
           'css-loader',
           'postcss-loader',
@@ -60,6 +67,9 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: 'vue-multi-select-listbox.css',
     }),
-    // new BundleAnalyzerPlugin(),
+    new BundleAnalyzerPlugin(),
+    new ESLintPlugin({
+      extensions: ['ts', 'vue', 'js']
+    }),
   ],
 };
